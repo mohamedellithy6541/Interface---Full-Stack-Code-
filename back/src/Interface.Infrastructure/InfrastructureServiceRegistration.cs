@@ -1,4 +1,4 @@
-using Interface.Application.Abstractions.Authentication;
+﻿using Interface.Application.Abstractions.Authentication;
 using Interface.Application.Abstractions.Payroll;
 using Interface.Application.Abstractions.Persistence;
 using Interface.Infrastructure.Authentication;
@@ -13,7 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Interface.Infrastructure;
 
-public static class DependencyInjection
+public static class InfrastructureServiceRegistration
 {
     public const string ConnectionStringName = "Default";
 

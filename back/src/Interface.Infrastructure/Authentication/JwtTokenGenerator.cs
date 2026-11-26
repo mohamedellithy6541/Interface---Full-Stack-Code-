@@ -18,11 +18,11 @@ internal sealed class JwtTokenGenerator(IOptions<JwtOptions> options, TimeProvid
 
         var claims = new List<Claim>
         {
-            new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new(JwtRegisteredClaimNames.Email, user.Email),
-            new(JwtRegisteredClaimNames.Name, user.DisplayName),
-            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new(ClaimTypes.Role, user.Role)
+            new(AppClaimTypes.UserId, user.Id.ToString()),
+            new(AppClaimTypes.Email, user.Email),
+            new(AppClaimTypes.Name, user.DisplayName),
+            new(AppClaimTypes.Role, user.Role),
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
         if (user.EmployeeId is { } employeeId)
             claims.Add(new Claim(AppClaimTypes.EmployeeId, employeeId.ToString()));
