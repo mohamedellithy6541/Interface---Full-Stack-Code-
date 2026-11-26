@@ -1,4 +1,5 @@
 using Interface.Application.Abstractions.Authentication;
+using Interface.Domain.Users;
 using Interface.Infrastructure.Authentication;
 
 namespace Interface.Api.Authentication;
@@ -14,6 +15,8 @@ internal sealed class CurrentUser(IHttpContextAccessor httpContextAccessor) : IC
     public string? Role => Principal?.FindFirst(AppClaimTypes.Role)?.Value;
 
     public Guid? EmployeeId => ReadGuid(AppClaimTypes.EmployeeId);
+
+    public bool IsHr => Role == UserRole.Hr;
 
     private Guid? ReadGuid(string claimType) =>
         Guid.TryParse(Principal?.FindFirst(claimType)?.Value, out var value) ? value : null;

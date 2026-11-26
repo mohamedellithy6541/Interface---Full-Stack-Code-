@@ -30,5 +30,5 @@ public interface ICurrentUser
     Guid? UserId { get; }
     string? Role { get; }
     Guid? EmployeeId { get; }
-    bool IsHr => Role == UserRole.Hr;
+    bool IsHr { get; }
 }
