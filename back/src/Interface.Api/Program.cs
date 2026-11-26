@@ -22,9 +22,9 @@ builder.Services
 
 var app = builder.Build();
 
+app.UseSerilogRequestLogging(); // Outermost, so it logs the final status code written by the error middleware.
 app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
 app.UseStatusCodePages(); // Empty 401/403/404 responses also get a Problem Details body.
-app.UseSerilogRequestLogging();
 
 if (app.Environment.IsDevelopment() || app.Configuration.GetValue<bool>("Swagger:Enabled"))
 {
