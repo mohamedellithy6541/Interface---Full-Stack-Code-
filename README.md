@@ -11,7 +11,27 @@ The assessment brief is in [`docs/Interface_Code_Assessment_2026.md`](docs/Inter
 
 ---
 
-## Quick start (backend)
+## Quick start with Docker (recommended)
+
+Prerequisites: Docker Desktop. Nothing else: SQL Server runs in a container.
+
+```powershell
+Copy-Item .env.example .env      # then put your own values in .env (it is git-ignored)
+docker compose up --build -d
+```
+
+- API + Swagger: http://localhost:5019/swagger
+- Health: http://localhost:5019/health
+- SQL Server: `localhost,1434` (user `sa`, password from `.env`), data kept in the `sqlserver-data` volume
+
+On first start the API waits until SQL Server is healthy, applies the migrations and seeds the demo data.
+Stop with `docker compose down`; add `-v` to also delete the database.
+
+The images: [`back/Dockerfile`](back/Dockerfile) is a multi-stage build (SDK image to publish, small ASP.NET runtime
+image to run, as a non-root user). [`docker-compose.yml`](docker-compose.yml) wires SQL Server 2022 and the API;
+every secret comes from `.env`.
+
+## Quick start without Docker (backend)
 
 Prerequisites: .NET SDK 9, and SQL Server reachable at `Server=.` with Windows authentication.
 (Use a different server by setting `ConnectionStrings__Default`; see [`back/.env.example`](back/.env.example).)
@@ -222,7 +242,8 @@ The database stores money as `decimal(18,2)` and the API rejects inputs with mor
 - One payroll policy for everyone. Next: policies per country or entity, with effective dates.
 - No refresh tokens. The access token simply expires (60 minutes).
 - HR cannot yet create login accounts for employees from the API; demo accounts come from the seed.
-- Integration tests (WebApplicationFactory + Testcontainers SQL Server) and Docker / docker-compose are not done yet.
+- Integration tests (WebApplicationFactory + Testcontainers SQL Server) are not done yet.
+- No CI/CD pipeline (left out on purpose for this assessment); tests run locally with `dotnet test`.
 - No audit log of who changed what (only created/updated timestamps).
 
 ## AI usage

@@ -4,7 +4,7 @@
 
 | Tool | Model | Used for |
 | --- | --- | --- |
-| Claude Code (Claude desktop app, Code tab) | Claude Opus 5.5 | Converting the assessment PDF to Markdown, scaffolding the solution, writing the backend layers, unit tests, README and CI workflow |
+| Claude Code (Claude desktop app, Code tab) | Claude Opus 5.5 | Converting the assessment PDF to Markdown, scaffolding the solution, writing the backend layers, unit tests, README, Dockerfile and docker-compose |
 
 ## Prompts and sessions
 
@@ -18,7 +18,7 @@
 | `docs/Interface_Code_Assessment_2026.md` (PDF to Markdown) | Yes | Yes |
 | Backend: Domain, Application, Infrastructure, Api | Yes, from my architecture and library choices (Clean Architecture, CQRS with MediatR, AutoMapper, FluentValidation, JWT + Google, global middleware, static registration classes) | Yes |
 | Backend unit tests | Yes | Yes |
-| README, CI workflow | Yes | Yes |
+| README, Dockerfile, docker-compose | Yes | Yes |
 
 My decisions, given to the AI as instructions: the stack (ASP.NET Core Web API on .NET 9, Angular 21), Clean Architecture,
 CQRS, AutoMapper, FluentValidation, JWT plus Google OAuth, RFC 7807 Problem Details from one global middleware,
