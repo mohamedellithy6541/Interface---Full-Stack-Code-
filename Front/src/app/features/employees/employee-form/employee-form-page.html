@@ -1,0 +1,111 @@
+<div class="page-header">
+  <div>
+    <a routerLink="/employees" class="back-link">← Employees</a>
+    <h1>{{ isEdit() ? 'Edit employee' : 'Add employee' }}</h1>
+  </div>
+</div>
+
+@if (loadError(); as error) {
+  <div class="alert alert--error" role="alert"><p>{{ error }}</p></div>
+} @else if (loading()) {
+  <p class="muted">Loading employee…</p>
+} @else {
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    @if (saveErrors().length > 0) {
+      <div class="alert alert--error" role="alert">
+        <p>{{ saveErrors()[0] }}</p>
+        @if (saveErrors().length > 1) {
+          <ul>
+            @for (message of saveErrors().slice(1); track $index) {
+              <li>{{ message }}</li>
+            }
+          </ul>
+        }
+      </div>
+    }
+
+    <section class="card">
+      <h2 class="card__title">Employee details</h2>
+      <div class="form-grid">
+        <div class="field">
+          <label class="field__label" for="fullName">Full name</label>
+          <input id="fullName" class="input" formControlName="fullName" autocomplete="name" [maxLength]="limits.fullName" />
+          <app-field-error [control]="form.controls.fullName" label="Full name" />
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="email">Email</label>
+          <input id="email" class="input" type="email" formControlName="email" autocomplete="email" />
+          <app-field-error [control]="form.controls.email" label="Email" />
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="jobTitle">Job title</label>
+          <input id="jobTitle" class="input" formControlName="jobTitle" [maxLength]="limits.jobTitle" />
+          <app-field-error [control]="form.controls.jobTitle" label="Job title" />
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="department">Department</label>
+          <input id="department" class="input" formControlName="department" list="department-options" [maxLength]="limits.department" />
+          <datalist id="department-options">
+            @for (department of departments(); track department) {
+              <option [value]="department"></option>
+            }
+          </datalist>
+          <app-field-error [control]="form.controls.department" label="Department" />
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="hireDate">Hire date</label>
+          <input id="hireDate" class="input" type="date" formControlName="hireDate" [max]="today" />
+          <app-field-error [control]="form.controls.hireDate" label="Hire date" />
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="status">Status</label>
+          <select id="status" class="select" formControlName="status">
+            @for (status of statuses; track status) {
+              <option [value]="status">{{ status }}</option>
+            }
+          </select>
+          <app-field-error [control]="form.controls.status" label="Status" />
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 class="card__title">Pay</h2>
+      <div class="form-grid">
+        <div class="field">
+          <label class="field__label" for="baseMonthlySalary">Base monthly salary</label>
+          <input id="baseMonthlySalary" class="input" type="number" min="0.01" step="0.01" formControlName="baseMonthlySalary" />
+          <app-field-error [control]="form.controls.baseMonthlySalary" label="Base monthly salary" />
+        </div>
+      </div>
+
+      <div class="pay-lists">
+        <app-pay-components-editor
+          [items]="form.controls.allowances"
+          title="Allowances"
+          hint="Fixed monthly amounts added to gross pay, e.g. transport or housing."
+          addLabel="+ Add allowance"
+          idPrefix="allowance" />
+
+        <app-pay-components-editor
+          [items]="form.controls.deductions"
+          title="Other deductions"
+          hint="Fixed monthly amounts taken from net pay, e.g. a loan repayment. Tax and social insurance are calculated automatically."
+          addLabel="+ Add deduction"
+          idPrefix="deduction" />
+      </div>
+    </section>
+
+    <div class="form-actions">
+      <a routerLink="/employees" class="btn btn--ghost">Cancel</a>
+      <button type="submit" class="btn" [disabled]="saving()">
+        {{ saving() ? 'Saving…' : isEdit() ? 'Save changes' : 'Create employee' }}
+      </button>
+    </div>
+  </form>
+}

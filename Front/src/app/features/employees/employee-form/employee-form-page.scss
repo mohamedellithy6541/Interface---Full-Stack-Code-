@@ -1,0 +1,14 @@
+.back-link {
+  display: inline-block;
+  margin-bottom: var(--space-2);
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+
+.pay-lists {
+  display: grid;
+  gap: var(--space-6);
+  margin-top: var(--space-6);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--color-border);
+}

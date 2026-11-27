@@ -1,0 +1,98 @@
+.back-link {
+  display: inline-block;
+  margin-bottom: var(--space-2);
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+
+.toolbar {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-2);
+}
+
+.payslip {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  transition: opacity 0.15s ease;
+
+  &--loading {
+    opacity: 0.6;
+  }
+}
+
+.payslip__header {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-6);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+.payslip__name {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.payslip__period {
+  text-align: right;
+}
+
+.payslip__columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+
+  .card + .card {
+    margin-top: 0;
+  }
+
+  @media (max-width: 760px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.lines {
+  td,
+  th {
+    white-space: normal;
+  }
+
+  tfoot th {
+    border-bottom: 0;
+    color: var(--color-text);
+    font-size: 0.9375rem;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+}
+
+.note {
+  font-size: 0.8125rem;
+}
+
+.net {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-6);
+  border-radius: var(--radius-lg);
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 1.125rem;
+
+  strong {
+    font-size: 1.5rem;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@media print {
+  .toolbar,
+  .back-link {
+    display: none;
+  }
+}

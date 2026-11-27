@@ -1,0 +1,104 @@
+<div class="page-header">
+  <div>
+    @if (session.isHr()) {
+      <a routerLink="/employees" class="back-link">← Employees</a>
+    }
+    <h1>Payslip</h1>
+    <p>{{ payslip()?.employeeName ?? 'Monthly salary breakdown' }}</p>
+  </div>
+
+  <div class="toolbar">
+    <div class="field">
+      <label class="field__label" for="month">Month</label>
+      <input id="month" class="input" type="month" [value]="month()" (change)="onMonthChange($event)" />
+    </div>
+    <button type="button" class="btn btn--ghost" [disabled]="!payslip()" (click)="print()">Print</button>
+  </div>
+</div>
+
+@if (error(); as error) {
+  <div class="alert" [class.alert--warning]="isBusinessRuleError()" [class.alert--error]="!isBusinessRuleError()" role="alert">
+    <p><strong>{{ error.title }}.</strong> {{ error.message }}</p>
+  </div>
+}
+
+@if (loading() && !payslip()) {
+  <p class="muted">Calculating payslip…</p>
+}
+
+@if (payslip(); as slip) {
+  <article class="payslip" [class.payslip--loading]="loading()" [attr.aria-busy]="loading()">
+    <header class="payslip__header">
+      <div>
+        <div class="muted">Employee</div>
+        <div class="payslip__name">{{ slip.employeeName }}</div>
+      </div>
+      <div class="payslip__period">
+        <div class="muted">Pay period</div>
+        <div>{{ slip.month }}</div>
+      </div>
+    </header>
+
+    <div class="payslip__columns">
+      <section class="card">
+        <h2 class="card__title">Earnings</h2>
+        <table class="table lines">
+          <tbody>
+            <tr>
+              <td>Base salary</td>
+              <td class="number">{{ slip.baseSalary | number: '1.2-2' }}</td>
+            </tr>
+            @for (line of slip.allowances; track $index) {
+              <tr>
+                <td>{{ line.name }} <span class="muted">(allowance)</span></td>
+                <td class="number">{{ line.amount | number: '1.2-2' }}</td>
+              </tr>
+            }
+          </tbody>
+          <tfoot>
+            <tr>
+              <th>Gross pay</th>
+              <th class="number">{{ slip.grossPay | number: '1.2-2' }}</th>
+            </tr>
+          </tfoot>
+        </table>
+      </section>
+
+      <section class="card">
+        <h2 class="card__title">Deductions</h2>
+        <table class="table lines">
+          <tbody>
+            <tr>
+              <td>
+                Income tax
+                <div class="muted note">on taxable income of {{ slip.taxableIncome | number: '1.2-2' }}</div>
+              </td>
+              <td class="number">{{ slip.incomeTax | number: '1.2-2' }}</td>
+            </tr>
+            <tr>
+              <td>Social insurance</td>
+              <td class="number">{{ slip.socialInsurance | number: '1.2-2' }}</td>
+            </tr>
+            @for (line of slip.otherDeductions; track $index) {
+              <tr>
+                <td>{{ line.name }}</td>
+                <td class="number">{{ line.amount | number: '1.2-2' }}</td>
+              </tr>
+            }
+          </tbody>
+          <tfoot>
+            <tr>
+              <th>Total deductions</th>
+              <th class="number">{{ slip.totalDeductions | number: '1.2-2' }}</th>
+            </tr>
+          </tfoot>
+        </table>
+      </section>
+    </div>
+
+    <section class="net">
+      <span>Net pay</span>
+      <strong>{{ slip.netPay | number: '1.2-2' }} {{ slip.currency }}</strong>
+    </section>
+  </article>
+}

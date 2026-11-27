@@ -1,0 +1,110 @@
+<div class="page-header">
+  <div>
+    <h1>Employees</h1>
+    <p>Manage employee records and open their monthly payslips.</p>
+  </div>
+  <a routerLink="/employees/new" class="btn">+ Add employee</a>
+</div>
+
+<section class="card filters" aria-label="Filters">
+  <div class="field filters__search">
+    <label class="field__label" for="search">Search</label>
+    <input id="search" class="input" type="search" placeholder="Name or email"
+           [value]="store.filters().search" (input)="onSearch($event)" />
+  </div>
+
+  <div class="field">
+    <label class="field__label" for="department">Department</label>
+    <select id="department" class="select" [value]="store.filters().department" (change)="onDepartmentChange($event)">
+      <option value="">All departments</option>
+      @for (department of store.departments(); track department) {
+        <option [value]="department">{{ department }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="field">
+    <label class="field__label" for="status">Status</label>
+    <select id="status" class="select" [value]="store.filters().status" (change)="onStatusChange($event)">
+      <option value="">All statuses</option>
+      @for (status of statuses; track status) {
+        <option [value]="status">{{ status }}</option>
+      }
+    </select>
+  </div>
+
+  <button type="button" class="btn btn--ghost filters__reset" (click)="store.resetFilters()">Reset</button>
+</section>
+
+<section class="card list" [class.list--loading]="store.loading()" [attr.aria-busy]="store.loading()">
+  @if (store.error(); as error) {
+    <div class="alert alert--error" role="alert">
+      <p>{{ error }}</p>
+    </div>
+  }
+
+  @if (store.result(); as result) {
+    @if (result.items.length > 0) {
+      <div class="table-wrapper">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Employee</th>
+              <th>Job title</th>
+              <th>Department</th>
+              <th>Hire date</th>
+              <th class="number">Base salary</th>
+              <th>Status</th>
+              <th><span class="visually-hidden">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (employee of result.items; track employee.id) {
+              <tr>
+                <td>
+                  <div class="employee-name">{{ employee.fullName }}</div>
+                  <div class="muted employee-email">{{ employee.email }}</div>
+                </td>
+                <td>{{ employee.jobTitle }}</td>
+                <td>{{ employee.department }}</td>
+                <td>{{ employee.hireDate | date: 'mediumDate' }}</td>
+                <td class="number">{{ employee.baseMonthlySalary | number: '1.2-2' }}</td>
+                <td>
+                  <span class="badge" [class.badge--success]="employee.status === 'Active'">{{ employee.status }}</span>
+                </td>
+                <td class="actions">
+                  <a class="btn btn--link" [routerLink]="['/employees', employee.id, 'payslip']">Payslip</a>
+                  <a class="btn btn--link" [routerLink]="['/employees', employee.id, 'edit']">Edit</a>
+                  <button type="button" class="btn btn--link btn--danger-text" (click)="pendingDelete.set(employee)">Delete</button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div class="empty">
+        <p>No employees match these filters.</p>
+        <button type="button" class="btn btn--ghost" (click)="store.resetFilters()">Clear filters</button>
+      </div>
+    }
+
+    <app-pagination
+      [page]="result.page"
+      [pageSize]="result.pageSize"
+      [totalCount]="result.totalCount"
+      [totalPages]="result.totalPages"
+      (pageChange)="store.goToPage($event)" />
+  } @else if (store.loading()) {
+    <p class="muted">Loading employees…</p>
+  }
+</section>
+
+<app-confirm-dialog
+  [open]="pendingDelete() !== null"
+  title="Delete employee?"
+  [message]="'This permanently deletes ' + (pendingDelete()?.fullName ?? '') + ' and their login. To keep the record, set the status to Inactive instead.'"
+  confirmLabel="Delete"
+  [busy]="deleting()"
+  (confirmed)="confirmDelete()"
+  (cancelled)="closeDeleteDialog()" />
