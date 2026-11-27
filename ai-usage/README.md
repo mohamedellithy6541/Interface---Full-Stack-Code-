@@ -1,9 +1,13 @@
 # AI usage
 
-I used **Claude Code** (Anthropic, model Claude Opus 5.5) as a coding assistant throughout this project, to move
-faster. I designed the application and directed the work; Claude Code wrote code from my instructions, one layer
-at a time, and ran the builds and tests. I reviewed each part, asked it to explain anything I was unsure of,
-and changed direction where I disagreed.
+I used **Claude Code** (Anthropic, model Claude Opus 5.5) as a tool to improve my work:
+
+- **to move faster:** I designed the application and directed the work; Claude Code wrote code from my
+  instructions, one layer at a time, and ran the builds;
+- **to raise the quality:** it caught problems such as a vulnerable library version and a missing field in error
+  responses, and I reviewed each part, asked it to explain anything I was unsure of, and changed direction where I disagreed;
+- **to test all the cases:** 111 automated unit tests (78 backend, 33 front end), plus hand testing of every API
+  endpoint (success, 400, 401, 403, 404, 409 and 422 responses) and every screen in the browser, both locally and in Docker.
 
 ---
 

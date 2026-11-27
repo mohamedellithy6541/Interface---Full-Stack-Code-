@@ -714,4 +714,6 @@ The database stores money as `decimal(18,2)` and the API rejects inputs with mor
 
 ## AI usage
 
-See [`ai-usage/`](ai-usage/).
+I used **Claude Code** as a tool to improve my work: to move faster (it wrote code from my instructions and
+design), to raise the quality (reviewing and fixing problems it found), and to test all the cases (111 unit tests,
+plus hand testing of every endpoint and screen). Details: [`ai-usage/README.md`](ai-usage/README.md).
