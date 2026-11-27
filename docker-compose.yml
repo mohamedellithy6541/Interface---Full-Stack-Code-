@@ -1,4 +1,6 @@
-# Starts SQL Server and the API. Copy .env.example to .env first, then run: docker compose up --build
+# Starts SQL Server, the API and the Angular front end. Copy .env.example to .env first, then run:
+#   docker compose up --build -d
+# Front end: http://localhost:8080   API + Swagger: http://localhost:5019/swagger
 name: interface-payroll
 
 services:
@@ -36,9 +38,22 @@ services:
       Seed__DemoPassword: ${SEED_DEMO_PASSWORD:?Set SEED_DEMO_PASSWORD in .env}
       Seed__GoogleHrEmails__0: ${GOOGLE_HR_EMAIL:-}
       Swagger__Enabled: "true"
-      Cors__AllowedOrigins__0: "http://localhost:4200"
+      Cors__AllowedOrigins__0: "http://localhost:8080"   # the front container
+      Cors__AllowedOrigins__1: "http://localhost:4200"   # ng serve during development
     ports:
       - "5019:8080"
+    restart: unless-stopped
+
+  front:
+    build:
+      context: ./Front
+      args:
+        API_BASE_URL: "http://localhost:5019"   # called by the browser, so it is the host port of the api service
+        GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+    depends_on:
+      - api
+    ports:
+      - "8080:80"
     restart: unless-stopped
 
 volumes:
