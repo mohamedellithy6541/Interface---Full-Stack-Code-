@@ -143,6 +143,41 @@ Business errors also carry a machine-readable `code`, e.g. `payroll.employee_ina
 
 ---
 
+## Authentication (Task 5)
+
+The brief asks for one of "SSO with an identity provider" or "JWT with at least two roles". The app has **both**:
+two ways to sign in, and both end with the same JWT issued by our API.
+
+| | 1. Email + password | 2. Sign in with Google |
+| --- | --- | --- |
+| Endpoint | `POST /api/auth/login` | `POST /api/auth/google` |
+| The user gives | Email and password | Their Google account, in Google's own sign-in window |
+| The server checks | Password against a PBKDF2 hash (ASP.NET Core Identity's `PasswordHasher`) | The Google ID token's signature, expiry, issuer and audience (our client ID), with `Google.Apis.Auth`; the email must be verified |
+| Who may sign in | Users with a password | Only Google accounts whose email already exists as a user (no self-registration) |
+| Result | Our JWT (60 minutes) | The same JWT |
+
+```
+Password:  Angular ──email+password──► POST /api/auth/login ──► check hash ──────────┐
+                                                                                    ├──► JWT (sub, email, role, employee_id)
+Google:    Angular ──Google button──► Google ──ID token──► POST /api/auth/google ──► verify token, find user by email ──┘
+```
+
+After sign-in, every request sends `Authorization: Bearer <JWT>` (added by the Angular `authInterceptor`).
+Because both methods produce the same token, the rest of the API only has to understand one kind of token.
+
+**Roles and permissions (enforced on the server):**
+
+| Role | Can do |
+| --- | --- |
+| `HR` | Everything: list, create, edit and delete employees; view any payslip |
+| `Employee` | View only their own payslip (`employee_id` claim must match); any other call returns 403 |
+
+- Every endpoint requires a signed-in user unless marked `[AllowAnonymous]` (login, Google login, health).
+- Employee endpoints use the `HrOnly` policy; the payslip handler checks HR-or-own-payslip before loading anything.
+- The Angular route guards hide pages the user cannot use, but they are only for convenience: the API decides.
+
+---
+
 ## Backend architecture
 
 Clean Architecture: dependencies point inwards only.
