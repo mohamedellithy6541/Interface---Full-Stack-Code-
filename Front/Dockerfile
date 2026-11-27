@@ -7,13 +7,10 @@ RUN npm ci
 
 COPY . .
 
-# Angular settings are compiled in, so the API URL and Google client ID are passed as build arguments.
+# Angular settings are compiled in, so the API URL is a build argument.
+# The Google client ID comes from src/environments/environment.ts.
 ARG API_BASE_URL=http://localhost:5019
-ARG GOOGLE_CLIENT_ID=
-RUN sed -i \
-      -e "s|apiBaseUrl: '[^']*'|apiBaseUrl: '${API_BASE_URL}'|" \
-      -e "s|googleClientId: '[^']*'|googleClientId: '${GOOGLE_CLIENT_ID}'|" \
-      src/environments/environment.ts \
+RUN sed -i "s|apiBaseUrl: '[^']*'|apiBaseUrl: '${API_BASE_URL}'|" src/environments/environment.ts \
  && npx ng build --configuration production
 
 # Runtime stage: serve the static files with nginx.

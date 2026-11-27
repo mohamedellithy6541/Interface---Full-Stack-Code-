@@ -81,18 +81,19 @@ cd Front; npm test -- --watch=false   # 33 frontend unit tests (Vitest), includi
 ```powershell
 cd back/src/Interface.Api
 dotnet user-secrets set "Jwt:SigningKey" "<at least 32 random characters>"
-dotnet user-secrets set "Authentication:Google:ClientId" "<your OAuth web client id>.apps.googleusercontent.com"
 dotnet user-secrets set "Seed:GoogleHrEmails:0" "you@gmail.com"
 ```
 
 - Without `Jwt:SigningKey`, Development uses a random key per run, so tokens stop working after a restart.
   Outside Development the API refuses to start without one.
-- Google sign-in: create an **OAuth 2.0 Client ID (Web application)** in Google Cloud Console and add
-  `http://localhost:4200` and `http://localhost:8080` as authorised JavaScript origins. Then put the client ID in
-  three places: the API (above, or `GOOGLE_CLIENT_ID` in `.env` for Docker), and the front end
-  (`googleClientId` in `Front/src/environments/environment.ts`; Docker passes `GOOGLE_CLIENT_ID` in as a build argument).
-  The "Sign in with Google" button only appears once a client ID is set.
-  Only Google accounts whose email already exists as a user can sign in; `Seed:GoogleHrEmails` creates HR users for them.
+- **Google sign-in is configured** with an OAuth 2.0 Web client ID (authorised JavaScript origins
+  `http://localhost:4200` and `http://localhost:8080`, no redirect URIs). The client ID is a public identifier,
+  not a secret, so it is committed in two places that must match: `Authentication:Google:ClientId` in
+  [`appsettings.json`](back/src/Interface.Api/appsettings.json) (the API checks Google tokens were issued for it)
+  and `googleClientId` in [`environment.ts`](Front/src/environments/environment.ts) (the button).
+  To use your own Google project, replace it in both. The client **secret** is not used and must never be committed.
+- Only Google accounts whose email already exists as a user can sign in. Add your Gmail as an HR user with
+  `Seed:GoogleHrEmails` (user-secrets above) or `GOOGLE_HR_EMAIL` in `.env` for Docker; it is created on the next start.
 
 ---
 
@@ -313,8 +314,7 @@ The database stores money as `decimal(18,2)` and the API rejects inputs with mor
 - Integration tests (WebApplicationFactory + Testcontainers SQL Server) are not done yet.
 - No CI/CD pipeline (left out on purpose for this assessment); tests run locally.
 - The JWT is stored in `localStorage`, which an XSS bug could read. Next: an HttpOnly cookie with refresh tokens.
-- Google sign-in has not yet been tried with a real Google client ID; it is covered by unit tests on both sides.
-- The front end's API URL and Google client ID are compiled in (a Docker build argument). Next: load them from a runtime `config.json`.
+- The front end's API URL and Google client ID are compiled in. Next: load them from a runtime `config.json`.
 - No end-to-end browser tests (e.g. Playwright); the flows were checked by hand.
 - No audit log of who changed what (only created/updated timestamps).
 

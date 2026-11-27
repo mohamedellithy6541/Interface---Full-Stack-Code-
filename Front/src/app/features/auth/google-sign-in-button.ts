@@ -38,6 +38,7 @@ export class GoogleSignInButton {
             size: 'large',
             text: 'signin_with',
             width: 320,
+            locale: 'en', // match the rest of the UI instead of the browser language
           });
         })
         .catch(() => this.unavailable.set(true));
