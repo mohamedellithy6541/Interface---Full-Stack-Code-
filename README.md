@@ -22,7 +22,6 @@ docker compose up --build -d
 
 - **App: http://localhost:8080**
 - API + Swagger: http://localhost:5019/swagger
-- Health: http://localhost:5019/health
 - SQL Server: `localhost,1434` (user `sa`, password from `.env`), data kept in the `sqlserver-data` volume
 
 On first start the API waits until SQL Server is healthy, applies the migrations and seeds the demo data.
