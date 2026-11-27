@@ -285,6 +285,366 @@ Front/src/app/
 
 ---
 
+## Wireframes and diagrams
+
+Screens are drawn as text wireframes of the real UI. Diagrams use Mermaid, which GitHub draws automatically.
+
+### Front end
+
+#### Login
+
+```text
+┌────────────────────────────────────────────────┐
+│                     [ I ]                      │
+│               Interface Payroll                │
+│   Sign in to manage employees and payslips.    │
+│                                                │
+│ Email                                          │
+│ ┌────────────────────────────────────────────┐ │
+│ │                                            │ │
+│ └────────────────────────────────────────────┘ │
+│ Password                                       │
+│ ┌────────────────────────────────────────────┐ │
+│ │ ••••••••••                                 │ │
+│ └────────────────────────────────────────────┘ │
+│ ┌────────────────────────────────────────────┐ │
+│ │                  Sign in                   │ │
+│ └────────────────────────────────────────────┘ │
+│       ──────────────  or  ──────────────       │
+│ ┌────────────────────────────────────────────┐ │
+│ │          G   Sign in with Google           │ │
+│ └────────────────────────────────────────────┘ │
+│                                                │
+│ ┌────────────────────────────────────────────┐ │
+│ │ Demo accounts (password Demo@12345)        │ │
+│ │ hr@interface.local        HR, full access  │ │
+│ │ sara.ali@interface.local  Employee         │ │
+│ └────────────────────────────────────────────┘ │
+└────────────────────────────────────────────────┘
+```
+
+#### Employees (HR only)
+
+```text
+┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ [I] Interface Payroll    [Employees]                          HR Administrator  (HR)  [Sign out] │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ Employees                                                                       [+ Add employee] │
+│ Manage employee records and open their monthly payslips.                                         │
+│                                                                                                  │
+│ ┌────────────────────────────────┐  ┌──────────────────────┐  ┌──────────────────┐ ┌───────┐     │
+│ │ Search: Name or email          │  │ All departments  ▼   │  │ All statuses ▼   │ │ Reset │     │
+│ └────────────────────────────────┘  └──────────────────────┘  └──────────────────┘ └───────┘     │
+│                                                                                                  │
+│ ┌──────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ EMPLOYEE                  JOB TITLE          DEPARTMENT   HIRE DATE    BASE SALARY  STATUS   │ │
+│ │ ──────────────────────────────────────────────────────────────────────────────────────────── │ │
+│ │ Ahmed Mostafa             HR Manager         Human Res.   Nov 26, 2020   35,000.00  Active   │ │
+│ │ ahmed.mostafa@...                                         Payslip  Edit  Delete              │ │
+│ │ Dina Fathy                Marketing Spec.    Marketing    Nov 26, 2024   16,000.00  Active   │ │
+│ │ dina.fathy@...                                            Payslip  Edit  Delete              │ │
+│ │ Tamer Nabil               Office Assistant   Operations   Nov 26, 2023    8,000.00  Inactive │ │
+│ │ tamer.nabil@...                                           Payslip  Edit  Delete              │ │
+│ │ ...                                                                                          │ │
+│ │ ──────────────────────────────────────────────────────────────────────────────────────────── │ │
+│ │ Showing 1–10 of 12                                     [Previous]  Page 1 of 2  [Next]       │ │
+│ └──────────────────────────────────────────────────────────────────────────────────────────────┘ │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### Add / edit employee (HR only)
+
+Errors appear under each field. The red message under Email came back from the API (409) and was put on that field.
+
+```text
+┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ [I] Interface Payroll    [Employees]                          HR Administrator  (HR)  [Sign out] │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ ← Employees                                                                                      │
+│ Add employee                                   (edit page: "Edit employee", fields pre-filled)   │
+│                                                                                                  │
+│ ┌──────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ ! Please fix the highlighted fields.                                                         │ │
+│ └──────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ ┌──────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ Employee details                                                                             │ │
+│ │ Full name                                       Email                                        │ │
+│ │ ┌──────────────────────────────────────────┐    ┌──────────────────────────────────────────┐ │ │
+│ │ │ Ali Mansour                              │    │ sara.ali@interface.local                 │ │ │
+│ │ └──────────────────────────────────────────┘    └──────────────────────────────────────────┘ │ │
+│ │                                                 ! This email is already used (from API)      │ │
+│ │ Job title                                       Department                                   │ │
+│ │ ┌──────────────────────────────────────────┐    ┌──────────────────────────────────────────┐ │ │
+│ │ │ Data Analyst                             │    │ Finance            (suggestions)         │ │ │
+│ │ └──────────────────────────────────────────┘    └──────────────────────────────────────────┘ │ │
+│ │ Hire date                                       Status                                       │ │
+│ │ ┌──────────────────────────────────────────┐    ┌──────────────────────────────────────────┐ │ │
+│ │ │ 2025-02-10        [calendar]             │    │ Active            ▼                      │ │ │
+│ │ └──────────────────────────────────────────┘    └──────────────────────────────────────────┘ │ │
+│ └──────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ ┌──────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ Pay                                                                                          │ │
+│ │ Base monthly salary                                                                          │ │
+│ │ ┌──────────────────────────────────────────┐                                                 │ │
+│ │ │ 18500.50                                 │                                                 │ │
+│ │ └──────────────────────────────────────────┘                                                 │ │
+│ │ ────────────────────────────────────────────────────────────────────────────────────────     │ │
+│ │ Allowances   (fixed monthly amounts added to gross pay)                                      │ │
+│ │ ┌──────────────────────────────────────────────┐  ┌────────────────────────┐  ┌──────────┐   │ │
+│ │ │ Name: Transport                              │  │ Amount: 1200           │  │ Remove   │   │ │
+│ │ └──────────────────────────────────────────────┘  └────────────────────────┘  └──────────┘   │ │
+│ │ [+ Add allowance]                                                                            │ │
+│ │                                                                                              │ │
+│ │ Other deductions   (taken from net pay; tax and insurance are automatic)                     │ │
+│ │ None.                                                                                        │ │
+│ │ [+ Add deduction]                                                                            │ │
+│ └──────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│                                                                 [Cancel]  [Create employee]      │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### Delete confirmation
+
+```text
+┌────────────────────────────────────────────────────┐
+│ Delete employee?                                   │
+│                                                    │
+│ This permanently deletes Ali Mansour and their     │
+│ login. To keep the record, set the status to       │
+│ Inactive instead.                                  │
+│                                                    │
+│                              [Cancel]  [Delete]    │
+└────────────────────────────────────────────────────┘
+```
+
+#### Payslip (HR: any employee; Employee: own payslip only)
+
+An employee sees the same page, with "My payslip" in the header and no link back to the employee list.
+
+```text
+┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ [I] Interface Payroll    [Employees]                          HR Administrator  (HR)  [Sign out] │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ ┌──────────────────────────────────────────────────────────┐  ┌────────────────────────────────┐ │
+│ │ ← Employees                                              │  │ Month: November 2026  [▼]      │ │
+│ │ Payslip                                                  │  │                                │ │
+│ │ Sara Ali                                                 │  │ [Print]                        │ │
+│ └──────────────────────────────────────────────────────────┘  └────────────────────────────────┘ │
+│ ┌──────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ Employee: Sara Ali                                                       Pay period: 2026-11 │ │
+│ └──────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ ┌────────────────────────────────────────────┐  ┌────────────────────────────────────────────┐   │
+│ │ Earnings                                   │  │ Deductions                                 │   │
+│ │ ┌────────────────────────────────────────┐ │  │ ┌────────────────────────────────────────┐ │   │
+│ │ │ Base salary                  25,000.00 │ │  │ │ Income tax (taxable 28,000)   1,800.00 │ │   │
+│ │ │ Transport (allowance)         1,500.00 │ │  │ │ Social insurance              1,500.00 │ │   │
+│ │ │ Housing (allowance)           3,000.00 │ │  │ │ Medical plan                    400.00 │ │   │
+│ │ │ ────────────────────────────────────── │ │  │ │ ────────────────────────────────────── │ │   │
+│ │ │ Gross pay                    29,500.00 │ │  │ │ Total deductions              3,700.00 │ │   │
+│ │ └────────────────────────────────────────┘ │  │ └────────────────────────────────────────┘ │   │
+│ └────────────────────────────────────────────┘  └────────────────────────────────────────────┘   │
+│ ┌──────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ NET PAY                                                                        25,800.00 EGP │ │
+│ └──────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│                                                                                                  │
+│ ┌──────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ ! Business rule violated. A payslip cannot be generated for an inactive employee.            │ │
+│ └──────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│   (shown instead of the payslip for an inactive employee or a month before the hire date)        │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### Pages and routes
+
+```mermaid
+flowchart TD
+  L["/login<br/>(only when signed out)"] -->|"HR signs in"| EL["/employees<br/>list, search, filters, paging"]
+  L -->|"Employee signs in"| OWN["/employees/:id/payslip<br/>own payslip only"]
+  EL --> NEW["/employees/new<br/>add employee"]
+  EL --> EDIT["/employees/:id/edit<br/>edit employee"]
+  EL --> PAY["/employees/:id/payslip<br/>any employee"]
+  EL --> DEL["Delete dialog"]
+```
+
+#### How a page talks to the API
+
+```mermaid
+flowchart LR
+  P["Page component<br/>template only"] --> S["Store / form model<br/>state and rules"]
+  S --> GS["Generated API service<br/>ng-openapi-gen"]
+  GS --> AI["authInterceptor<br/>adds the Bearer JWT"]
+  AI --> EI["errorInterceptor<br/>401 goes to /login"]
+  EI --> API["Back-end API"]
+  API -. "Problem Details" .-> TE["toApiError and<br/>applyServerErrors"]
+  TE -. "message under each field" .-> P
+```
+
+### Back end
+
+#### Layers (Clean Architecture)
+
+Arrows point in the direction of the dependency. Infrastructure implements the interfaces that Application declares.
+
+```mermaid
+flowchart TB
+  UI["Angular app"] -->|"HTTP + JWT"| C
+  subgraph API["Interface.Api"]
+    MW["Global exception middleware"]
+    C["Controllers"]
+  end
+  subgraph APP["Interface.Application"]
+    MED["MediatR pipeline<br/>Logging, then Validation"]
+    H["Command and query handlers"]
+    I["Interfaces<br/>IEmployeeRepository, IUnitOfWork,<br/>IPayrollPolicyProvider, IJwtTokenGenerator"]
+  end
+  subgraph DOM["Interface.Domain"]
+    E["Employee, User"]
+    P["PayrollCalculator<br/>ProgressiveTaxCalculator<br/>SocialInsuranceCalculator"]
+  end
+  subgraph INF["Interface.Infrastructure"]
+    R["EF Core repositories<br/>and UnitOfWork"]
+    A["JWT generator, password hasher,<br/>Google token validator"]
+    CFG["Payroll policy<br/>from appsettings.json"]
+  end
+  C --> MED --> H
+  H --> I
+  H --> E
+  H --> P
+  R -. implements .-> I
+  A -. implements .-> I
+  CFG -. implements .-> I
+  R --> DB[("SQL Server")]
+  A --> G["Google"]
+```
+
+#### One request, step by step (create an employee)
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant UI as Angular
+  participant MW as Exception middleware
+  participant C as EmployeesController
+  participant V as ValidationBehavior
+  participant H as CreateEmployeeHandler
+  participant R as EmployeeRepository
+  participant DB as SQL Server
+  UI->>MW: POST /api/employees with JWT
+  MW->>C: pass the request on
+  C->>V: Send CreateEmployeeCommand through MediatR
+  alt input is invalid
+    V-->>MW: throw ValidationException
+    MW-->>UI: 400 Problem Details with errors per field
+  else input is valid
+    V->>H: Handle
+    H->>R: EmailExistsAsync
+    alt email already used
+      H-->>MW: throw ConflictException
+      MW-->>UI: 409 Problem Details
+    else new email
+      H->>R: Add employee
+      H->>DB: SaveChanges through UnitOfWork
+      H-->>C: EmployeeDto mapped with AutoMapper
+      C-->>UI: 201 Created with the employee
+    end
+  end
+```
+
+#### The two ways to sign in
+
+```mermaid
+sequenceDiagram
+  participant U as User
+  participant UI as Angular
+  participant G as Google
+  participant API as API
+  participant DB as SQL Server
+  Note over U,DB: 1. Email and password
+  U->>UI: email and password
+  UI->>API: POST /api/auth/login
+  API->>DB: find user by email
+  API->>API: check password hash (PBKDF2)
+  API-->>UI: JWT with role and employee_id
+  Note over U,DB: 2. Sign in with Google
+  U->>G: sign in in Google's window
+  G-->>UI: Google ID token
+  UI->>API: POST /api/auth/google
+  API->>G: check signature, issuer, audience and expiry
+  API->>DB: find user by email
+  API-->>UI: the same kind of JWT
+  Note over UI,API: Every later request sends the JWT as a Bearer token
+```
+
+#### Database tables
+
+```mermaid
+erDiagram
+  EMPLOYEES ||--o| USERS : "has a login"
+  EMPLOYEES {
+    uniqueidentifier Id PK
+    nvarchar FullName "max 100"
+    nvarchar Email UK
+    nvarchar JobTitle
+    nvarchar Department
+    date HireDate
+    decimal BaseMonthlySalary "decimal 18,2"
+    nvarchar Status "Active or Inactive"
+    nvarchar Allowances "JSON list of name and amount"
+    nvarchar Deductions "JSON list of name and amount"
+    datetimeoffset CreatedAtUtc
+    datetimeoffset UpdatedAtUtc
+  }
+  USERS {
+    uniqueidentifier Id PK
+    nvarchar Email UK
+    nvarchar DisplayName
+    nvarchar PasswordHash "empty for Google-only users"
+    nvarchar Role "HR or Employee"
+    uniqueidentifier EmployeeId FK "deleted with the employee"
+  }
+```
+
+#### How a payslip is calculated
+
+```mermaid
+flowchart TD
+  A["GET /api/employees/:id/payslip?month=2026-03"] --> V{"Month is yyyy-MM?"}
+  V -- no --> X0["400 validation error"]
+  V -- yes --> B{"HR, or the employee's own payslip?"}
+  B -- no --> X1["403 Forbidden"]
+  B -- yes --> C{"Employee exists?"}
+  C -- no --> X2["404 Not found"]
+  C -- yes --> D{"Active, and month not before hire date?"}
+  D -- no --> X3["422 Business rule violated"]
+  D -- yes --> E["Gross = base salary + allowances"]
+  E --> F["Social insurance = base x rate, limited to the cap"]
+  F --> T["Taxable income = gross - social insurance"]
+  T --> H["Income tax = progressive brackets on taxable income"]
+  H --> I["Net = gross - tax - insurance - other deductions"]
+  I --> J{"Net below zero?"}
+  J -- yes --> X4["422 Deductions exceed gross pay"]
+  J -- no --> K["200 Payslip<br/>every line rounded to 2 decimals"]
+```
+
+### Deployment
+
+#### Docker Compose
+
+```mermaid
+flowchart LR
+  B["Browser"] -->|"port 8080"| F["front<br/>nginx serving the Angular build"]
+  B -->|"port 5019 API calls"| A["api<br/>ASP.NET Core"]
+  A -->|"sqlserver:1433"| S[("sqlserver<br/>SQL Server 2022")]
+  S --- VOL[("volume<br/>sqlserver-data")]
+  ENV[".env<br/>passwords and keys"] -.-> A
+  ENV -.-> S
+```
+
+---
+
 ## Payroll rules
 
 ```
