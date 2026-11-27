@@ -2,28 +2,30 @@ import { ChangeDetectionStrategy, Component, ElementRef, afterNextRender, inject
 
 import { GoogleIdentityService } from '../../core/auth/google-identity.service';
 
-/** Renders Google's own "Sign in with Google" button and emits the ID token Google returns. */
+/**
+ * "Sign in with Google". With a client ID it renders Google's own button and emits the ID token Google returns.
+ * Without one (not configured yet) it shows a look-alike button that explains what is missing.
+ */
 @Component({
   selector: 'app-google-sign-in-button',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <div #host class="google-button"></div>
-    @if (unavailable()) {
-      <p class="muted">Google sign-in is unavailable right now.</p>
-    }
-  `,
-  styles: `.google-button { display: flex; justify-content: center; min-height: 44px; }`,
+  templateUrl: './google-sign-in-button.html',
+  styleUrl: './google-sign-in-button.scss',
 })
 export class GoogleSignInButton {
-  readonly clientId = input.required<string>();
+  readonly clientId = input('');
   readonly credential = output<string>();
 
   protected readonly unavailable = signal(false);
-  private readonly host = viewChild.required<ElementRef<HTMLElement>>('host');
+  protected readonly showSetupHint = signal(false);
+  private readonly host = viewChild<ElementRef<HTMLElement>>('host');
   private readonly googleIdentity = inject(GoogleIdentityService);
 
   constructor() {
     afterNextRender(() => {
+      const host = this.host()?.nativeElement;
+      if (!this.clientId() || !host) return;
+
       this.googleIdentity
         .load()
         .then((google) => {
@@ -31,7 +33,7 @@ export class GoogleSignInButton {
             client_id: this.clientId(),
             callback: (response) => this.credential.emit(response.credential),
           });
-          google.accounts.id.renderButton(this.host().nativeElement, {
+          google.accounts.id.renderButton(host, {
             theme: 'outline',
             size: 'large',
             text: 'signin_with',

@@ -1,0 +1,57 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.google-host {
+  display: flex;
+  justify-content: center;
+  min-height: 44px;
+}
+
+// Follows Google's "outline" sign-in button style.
+.google-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 40px;
+  padding: 0 var(--space-4);
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  background: #fff;
+  color: #3c4043;
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    background: #f8faff;
+    box-shadow: 0 1px 2px rgb(60 64 67 / 20%);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--color-primary-soft);
+    outline-offset: 1px;
+  }
+}
+
+.google-button__logo {
+  width: 18px;
+  height: 18px;
+}
+
+.hint {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.8125rem;
+  text-align: center;
+
+  code {
+    font-size: 0.75rem;
+  }
+}

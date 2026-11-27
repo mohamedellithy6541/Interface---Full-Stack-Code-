@@ -28,10 +28,8 @@
       </button>
     </form>
 
-    @if (googleClientId) {
-      <div class="login__divider"><span>or</span></div>
-      <app-google-sign-in-button [clientId]="googleClientId" (credential)="signInWithGoogle($event)" />
-    }
+    <div class="login__divider"><span>or</span></div>
+    <app-google-sign-in-button [clientId]="googleClientId" (credential)="signInWithGoogle($event)" />
 
     @if (showDemoAccounts) {
       <div class="alert alert--info login__demo">
