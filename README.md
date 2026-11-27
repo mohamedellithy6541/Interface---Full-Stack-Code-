@@ -5,7 +5,7 @@ A full-stack application for managing employees and calculating monthly payslips
 | Part | Folder | Stack | Status |
 | --- | --- | --- | --- |
 | Backend API | [`back/`](back/) | ASP.NET Core Web API (.NET 9), EF Core 9 + SQL Server | Done |
-| Frontend | [`Front/`](Front/) | Angular 21, TypeScript, SCSS, client generated from Swagger | Next |
+| Frontend | [`Front/`](Front/) | Angular 21, TypeScript, SCSS, API client generated from Swagger with ng-openapi-gen | Done |
 
 The assessment brief is in [`docs/Interface_Code_Assessment_2026.md`](docs/Interface_Code_Assessment_2026.md).
 
@@ -20,6 +20,7 @@ Copy-Item .env.example .env      # then put your own values in .env (it is git-i
 docker compose up --build -d
 ```
 
+- **App: http://localhost:8080**
 - API + Swagger: http://localhost:5019/swagger
 - Health: http://localhost:5019/health
 - SQL Server: `localhost,1434` (user `sa`, password from `.env`), data kept in the `sqlserver-data` volume
@@ -27,9 +28,18 @@ docker compose up --build -d
 On first start the API waits until SQL Server is healthy, applies the migrations and seeds the demo data.
 Stop with `docker compose down`; add `-v` to also delete the database.
 
-The images: [`back/Dockerfile`](back/Dockerfile) is a multi-stage build (SDK image to publish, small ASP.NET runtime
-image to run, as a non-root user). [`docker-compose.yml`](docker-compose.yml) wires SQL Server 2022 and the API;
-every secret comes from `.env`.
+The images:
+- [`back/Dockerfile`](back/Dockerfile): multi-stage build (SDK image to publish, small ASP.NET runtime image to run, as a non-root user).
+- [`Front/Dockerfile`](Front/Dockerfile): Node image builds the Angular app, nginx serves it ([`Front/nginx.conf`](Front/nginx.conf) sends unknown paths to `index.html` so deep links work).
+- [`docker-compose.yml`](docker-compose.yml) wires SQL Server 2022, the API and the front end. Every secret comes from `.env`.
+
+| Demo account | Password | Role |
+| --- | --- | --- |
+| `hr@interface.local` | `Demo@12345` | HR: everything |
+| `sara.ali@interface.local` | `Demo@12345` | Employee: only her own payslip |
+
+The login page has buttons that fill these in. They are demo-only accounts, created only when seeding is switched on
+(`appsettings.Development.json` locally, `Seed__Enabled` in `docker-compose.yml`).
 
 ## Quick start without Docker (backend)
 
@@ -41,21 +51,29 @@ cd back
 dotnet run --project src/Interface.Api --launch-profile http
 ```
 
-That one command builds the API, applies the EF Core migrations, seeds demo data and opens Swagger at
+That one command builds the API, applies the EF Core migrations, seeds the demo accounts above and opens Swagger at
 http://localhost:5019/swagger.
 
-| Demo account | Password | Role |
-| --- | --- | --- |
-| `hr@interface.local` | `Demo@12345` | HR: everything |
-| `sara.ali@interface.local` | `Demo@12345` | Employee: only her own payslip |
+## Quick start without Docker (frontend)
 
-These are demo-only credentials, set in `appsettings.Development.json`. Seeding is off in every other environment.
-
-Run the unit tests:
+Prerequisites: Node.js 22 or later, and the API running on http://localhost:5019 (either way above).
 
 ```powershell
-cd back
-dotnet test
+cd Front
+npm install
+npm start
+```
+
+Open http://localhost:4200. The API URL and the Google client ID are in
+[`Front/src/environments/environment.ts`](Front/src/environments/environment.ts).
+
+## Tests
+
+```powershell
+cd back; dotnet test          # 78 backend unit tests (xUnit)
+```
+```powershell
+cd Front; npm test -- --watch=false   # 33 frontend unit tests (Vitest), including component tests
 ```
 
 ### Optional settings (user-secrets or environment variables, never committed)
@@ -69,8 +87,11 @@ dotnet user-secrets set "Seed:GoogleHrEmails:0" "you@gmail.com"
 
 - Without `Jwt:SigningKey`, Development uses a random key per run, so tokens stop working after a restart.
   Outside Development the API refuses to start without one.
-- Google sign-in: create an **OAuth 2.0 Client ID (Web application)** in Google Cloud Console, add
-  `http://localhost:4200` as an authorised JavaScript origin, and set the client ID above.
+- Google sign-in: create an **OAuth 2.0 Client ID (Web application)** in Google Cloud Console and add
+  `http://localhost:4200` and `http://localhost:8080` as authorised JavaScript origins. Then put the client ID in
+  three places: the API (above, or `GOOGLE_CLIENT_ID` in `.env` for Docker), and the front end
+  (`googleClientId` in `Front/src/environments/environment.ts`; Docker passes `GOOGLE_CLIENT_ID` in as a build argument).
+  The "Sign in with Google" button only appears once a client ID is set.
   Only Google accounts whose email already exists as a user can sign in; `Seed:GoogleHrEmails` creates HR users for them.
 
 ---
@@ -121,7 +142,7 @@ Business errors also carry a machine-readable `code`, e.g. `payroll.employee_ina
 
 ---
 
-## Architecture
+## Backend architecture
 
 Clean Architecture: dependencies point inwards only.
 
@@ -178,6 +199,53 @@ Api ──► Application ──► Domain
 - **New tax rules**: change the `Payroll:TaxBrackets` configuration, or register another `ITaxCalculator`.
 - **New module** (leave, attendance): add a `Features/Leave` folder in Application, an entity in Domain, a
   repository in Infrastructure and a controller. Nothing existing changes.
+
+---
+
+## Frontend architecture
+
+Angular 21 with standalone components, signals and zoneless change detection. Pages are lazy-loaded.
+
+```
+Front/src/app/
+├── core/                       App-wide, created once
+│   ├── api/generated/          Typed API client generated from Swagger (do not edit by hand)
+│   ├── auth/                   SessionService (JWT + user), auth interceptor, route guards, Google sign-in loader
+│   ├── http/                   Error interceptor and Problem Details → ApiError conversion
+│   ├── layout/                 Shell: header, navigation, user menu
+│   └── notifications/          Toast messages
+├── shared/                     Reusable, no business knowledge
+│   ├── forms/                  Validators, server-error mapping, <app-field-error>
+│   └── ui/                     Pagination, confirm dialog
+└── features/                   One folder per screen
+    ├── auth/                   Login page (email/password + Google button)
+    ├── employees/              List (+ EmployeeListStore), create/edit form (+ form model)
+    └── payslip/                Monthly payslip page
+```
+
+- **The API client is generated, not hand-written.** [ng-openapi-gen](https://github.com/cyclosproject/ng-openapi-gen)
+  reads the backend's Swagger document and writes typed Angular services and models (`EmployeesService`,
+  `EmployeeDto`, `PayslipDto`, ...). After an API change: start the API, then run `npm run api:update`.
+  The downloaded spec is committed in [`Front/openapi/`](Front/openapi/), so `npm run api:generate` works offline.
+- **No business logic in components.** Components only bind the template. State and loading live in a store
+  (`EmployeeListStore`), form rules and request building in a form model (`employee-form.model.ts`), auth in
+  `SessionService`. Payroll calculation stays on the server; the UI only displays the payslip.
+- **Validation on both sides.** The forms repeat the API's rules (required, max length, email, hire date not in the
+  future, salary > 0, at most 2 decimals) for instant feedback. The API still validates everything. If the server
+  rejects a request, its Problem Details `errors` are put on the matching inputs (`applyServerErrors`), e.g.
+  "email already exists" appears under the Email field.
+- **Error handling in one place.** `errorInterceptor` sends the user to the login page when the token is rejected;
+  `toApiError` turns any HTTP failure into one shape the pages display.
+- **Auth.** The JWT is kept in `localStorage` and added to API calls by `authInterceptor` (only for our API's URL).
+  Guards decide what the UI shows (HR pages, an employee's own payslip); the API enforces the same rules.
+- **Styling.** Plain SCSS with design tokens (CSS variables) in `styles.scss`, plus a small stylesheet per component.
+  No UI kit: the app needs a few buttons, forms and tables, which do not justify a large dependency.
+- **Google sign-in** uses Google's own script directly (two calls), so no wrapper package is needed.
+
+| Library | Why |
+| --- | --- |
+| ng-openapi-gen (dev only) | Generates the typed API client from Swagger, so the front end cannot drift from the API |
+| Vitest (Angular 21 default) | Unit and component tests |
 
 ---
 
@@ -243,7 +311,11 @@ The database stores money as `decimal(18,2)` and the API rejects inputs with mor
 - No refresh tokens. The access token simply expires (60 minutes).
 - HR cannot yet create login accounts for employees from the API; demo accounts come from the seed.
 - Integration tests (WebApplicationFactory + Testcontainers SQL Server) are not done yet.
-- No CI/CD pipeline (left out on purpose for this assessment); tests run locally with `dotnet test`.
+- No CI/CD pipeline (left out on purpose for this assessment); tests run locally.
+- The JWT is stored in `localStorage`, which an XSS bug could read. Next: an HttpOnly cookie with refresh tokens.
+- Google sign-in has not yet been tried with a real Google client ID; it is covered by unit tests on both sides.
+- The front end's API URL and Google client ID are compiled in (a Docker build argument). Next: load them from a runtime `config.json`.
+- No end-to-end browser tests (e.g. Playwright); the flows were checked by hand.
 - No audit log of who changed what (only created/updated timestamps).
 
 ## AI usage

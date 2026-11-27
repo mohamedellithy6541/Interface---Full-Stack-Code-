@@ -488,3 +488,7 @@ $RECYCLE.BIN/
 *.db-shm
 *.db-wal
 
+
+# Local tool settings
+.claude/
+
