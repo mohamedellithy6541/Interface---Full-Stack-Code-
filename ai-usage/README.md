@@ -5,7 +5,7 @@ I used **Claude Code** (Anthropic, model Claude Opus 5.5) as a tool to improve m
 - **to move faster:** I designed the application and directed the work; Claude Code wrote code from my
   instructions, one layer at a time, and ran the builds;
 - **to raise the quality:** it caught problems such as a vulnerable library version and a missing field in error
-  responses, and I reviewed each part, asked it to explain anything I was unsure of, and changed direction where I disagreed;
+  responses, and I reviewed each part and changed direction where I disagreed;
 - **to test all the cases:** 111 automated unit tests (78 backend, 33 front end), plus hand testing of every API
   endpoint (success, 400, 401, 403, 404, 409 and 422 responses) and every screen in the browser, both locally and in Docker.
 
@@ -28,20 +28,6 @@ I used **Claude Code** (Anthropic, model Claude Opus 5.5) as a tool to improve m
 EF Core + SQL Server; Angular 21 with SCSS and an API client generated from Swagger; Docker.
 
 ---
-
-## How the work was done (sessions)
-
-| Session | Goal | Outcome |
-| --- | --- | --- |
-| 1. Brief | Turn the assessment PDF into Markdown to use as a checklist | `docs/Interface_Code_Assessment_2026.md` |
-| 2. Backend | Build the API with my chosen architecture and libraries | Domain, Application (CQRS), Infrastructure (EF Core, JWT, Google), Api (global error middleware, Swagger), 78 unit tests |
-| 3. Review | Check the backend against the brief and make sure I understood it | Questions on error handling, exception types, test types, database and the payroll module; CI/CD dropped in favour of Docker |
-| 4. Docker | Run everything with one command | Dockerfiles and `docker-compose.yml` (SQL Server, API, front end) |
-| 5. Front end | Build the Angular client | Login, employee list and form, payslip page, 33 unit and component tests, responsive SCSS |
-| 6. Google sign-in | Connect my Google Cloud OAuth client | Google button on the login page, server-side token checks |
-
-The chat sessions themselves are not included: they contain personal working notes. I am happy to walk through
-any part of the work in the interview.
 
 ## My decisions
 
