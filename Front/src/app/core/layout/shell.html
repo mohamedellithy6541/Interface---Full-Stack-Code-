@@ -1,0 +1,30 @@
+<header class="topbar">
+  <div class="topbar__inner">
+    <a class="brand" [routerLink]="session.homeUrl()">
+      <span class="brand__mark" aria-hidden="true">I</span>
+      <span>Interface Payroll</span>
+    </a>
+
+    <nav class="nav" aria-label="Main">
+      @if (session.isHr()) {
+        <a routerLink="/employees" routerLinkActive="nav__link--active" class="nav__link">Employees</a>
+      } @else if (session.currentUser()?.employeeId) {
+        <a [routerLink]="session.homeUrl()" routerLinkActive="nav__link--active" class="nav__link">My payslip</a>
+      }
+    </nav>
+
+    @if (session.currentUser(); as user) {
+      <div class="user">
+        <div class="user__info">
+          <span class="user__name">{{ user.displayName }}</span>
+          <span class="badge" [class.badge--accent]="session.isHr()">{{ user.role }}</span>
+        </div>
+        <button type="button" class="btn btn--ghost" (click)="session.logout()">Sign out</button>
+      </div>
+    }
+  </div>
+</header>
+
+<main class="page">
+  <router-outlet />
+</main>
