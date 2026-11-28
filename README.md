@@ -7,8 +7,6 @@ A full-stack application for managing employees and calculating monthly payslips
 | Backend API | [`back/`](back/) | ASP.NET Core Web API (.NET 9), EF Core 9 + SQL Server | Done |
 | Frontend | [`Front/`](Front/) | Angular 21, TypeScript, SCSS, API client generated from Swagger with ng-openapi-gen | Done |
 
-The assessment brief is in [`docs/Interface_Code_Assessment_2026.md`](docs/Interface_Code_Assessment_2026.md).
-
 ---
 
 ## Quick start with Docker (recommended)
